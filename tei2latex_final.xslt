@@ -3,8 +3,9 @@
   xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:tex="placeholder.uri" exclude-result-prefixes="tex">
   <xsl:output method="text"/>
 
-  <!-- The name of this file is tei2LaTeX -->
   <!-- This xslt script converts TEI xml to LaTeX -->
+  <!-- First version created by Marjorie Burghart - 2017 -->
+
 
 
 
