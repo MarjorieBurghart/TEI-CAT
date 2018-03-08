@@ -4,7 +4,7 @@
   <xsl:output method="text"/>
 
   <!-- This xslt script converts TEI xml to LaTeX -->
-  <!-- First version created by Marjorie Burghart - 2017 -->
+  <!-- First version created by Marjorie Burghart for the TEI Critical Apparatus Toolbox - 2017 -->
 
 
 
