@@ -5,3 +5,5 @@ http://ciham-digital.huma-num.fr/teicat/
 
 The XSLT file offered in this repository is the one used for the TEI2LateX transformation. It aims at being as generic as possible for TEI critical editions using the parallel segmentation method. 
 
+Licence: Creative Commons by-sa-nc
+
