@@ -93,9 +93,9 @@
   <!-- do you want to print the document title? Yes if value is different from 0 -->
   <xsl:param name="printTitle">1</xsl:param>
   <!-- How big should we print the title? Accepted values are large, Large, LARGE, huge, Huge.  Those sizes are relative to the normal font size in the document.  For more information see: http://jacques-andre.fr/fontex/taille.pdf -->
-  <xsl:param name="printTitleSize">Large</xsl:param>
-  <!-- Should we print the title in small caps or caps? Accepted values: 0 (no formatting), smallcaps and caps -->
-  <xsl:param name="printTitleStyle">smallcaps</xsl:param>
+  <xsl:param name="printTitleSize"></xsl:param>
+  <!-- Should we print the title in small caps or caps? Accepted values: smallcaps and caps -->
+  <xsl:param name="printTitleStyle"></xsl:param>
 
 
 
@@ -192,6 +192,8 @@
     </xsl:if>
     <xsl:text>
     \usepackage[</xsl:text><xsl:value-of select="$baseFontSize"/><xsl:text>pt]{extsizes}</xsl:text>
+
+    <!-- Set margins -->
     <xsl:if test="$marginBinding != '' or $marginInner != '' or $marginOuter != '' or $marginTop != '' or $marginBottom != ''">
     <xsl:text>
       \usepackage[</xsl:text>
@@ -219,6 +221,7 @@
       </xsl:if>
       <xsl:text>]{geometry}</xsl:text>
     </xsl:if>
+
     <!-- Fancy headers and footers -->
     <xsl:text>
     \usepackage{fancyhdr} 
@@ -322,6 +325,22 @@
     <xsl:text>}
       \date{}
     </xsl:text>
+    
+    <!-- Title styling -->
+    <xsl:if test="$printTitleStyle != '' or $printTitleSize != ''">
+      <xsl:text>\usepackage{titling}
+      \pretitle{\begin{center}</xsl:text>
+      <xsl:choose>
+        <xsl:when test="$printTitleSize != ''"><xsl:text>\</xsl:text><xsl:value-of select="$printTitleSize"/></xsl:when>
+        <xsl:otherwise><xsl:text>\Large</xsl:text></xsl:otherwise>
+      </xsl:choose>
+      <xsl:choose>
+        <xsl:when test="$printTitleStyle = 'smallcaps'"><xsl:text>\scshape</xsl:text></xsl:when>
+        <xsl:when test="$printTitleStyle = 'caps'"><xsl:text>\MakeUppercase</xsl:text></xsl:when>
+      </xsl:choose>
+      <xsl:text>}</xsl:text>
+    </xsl:if>
+    
     <xsl:text>
     % Basic workaround for broken \section functionality in reledmac
     \newcommand{\TEIsection}[1]{\vspace{</xsl:text>
