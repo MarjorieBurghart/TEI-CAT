@@ -27,8 +27,8 @@
   <!-- Page size? Accepted values: 
  a0paper, a1paper, a2paper, a3paper, a4paper, a5paper, a6paper, b0paper, b1paper, b2paper, b3paper, b4paper, b5paper, b6paper, c0paper, c1paper, c2paper, c3paper, c4paper, c5paper, c6paper, b0j, b1j, b2j, b3j, b4j, b5j, b6j, ansiapaper, ansibpaper, ansicpaper, ansidpaper, ansiepaper, letterpaper, executivepaper, legalpaper -->
   <xsl:param name="pageSize">a4paper</xsl:param>
-  <!-- Use layout for double-sided printing? Accepted values = 0 (No), 1 (Yes) -->
-  <xsl:param name="doubleSided">1</xsl:param>
+  <!-- Use layout for facing pages? Accepted values = 0 (single pages), 1 (facing pages) -->
+  <xsl:param name="facingLayout">0</xsl:param>
   <!-- Setting the size of the margins, in cm -->
   <xsl:param name="marginInner"></xsl:param>
   <xsl:param name="marginOuter"></xsl:param>
@@ -161,7 +161,7 @@
 
 
   <xsl:template match="/">
-    <xsl:text>\documentclass[</xsl:text><xsl:value-of select="$pageSize"/><xsl:if test="$doubleSided = '1'"><xsl:text>,twoside</xsl:text></xsl:if><xsl:text>]{article}
+    <xsl:text>\documentclass[</xsl:text><xsl:value-of select="$pageSize"/><xsl:if test="$facingLayout = '1'"><xsl:text>,twoside</xsl:text></xsl:if><xsl:text>]{article}
     \usepackage[oldstyle,proportional]{libertine}
     \usepackage{fontspec}
     \usepackage{microtype}
