@@ -27,12 +27,14 @@
   <!-- Page size? Accepted values: 
  a0paper, a1paper, a2paper, a3paper, a4paper, a5paper, a6paper, b0paper, b1paper, b2paper, b3paper, b4paper, b5paper, b6paper, c0paper, c1paper, c2paper, c3paper, c4paper, c5paper, c6paper, b0j, b1j, b2j, b3j, b4j, b5j, b6j, ansiapaper, ansibpaper, ansicpaper, ansidpaper, ansiepaper, letterpaper, executivepaper, legalpaper -->
   <xsl:param name="pageSize">a4paper</xsl:param>
+  <!-- Use layout for double-sided printing? Accepted values = 0 (No), 1 (Yes) -->
+  <xsl:param name="doubleSided">1</xsl:param>
   <!-- Setting the size of the margins, in cm -->
-  <xsl:param name="marginInner">3</xsl:param>
-  <xsl:param name="marginOuter">3</xsl:param>
-  <xsl:param name="marginTop">3</xsl:param>
-  <xsl:param name="marginBottom">3</xsl:param>
-  <xsl:param name="marginBinding">0.5</xsl:param>
+  <xsl:param name="marginInner"></xsl:param>
+  <xsl:param name="marginOuter"></xsl:param>
+  <xsl:param name="marginTop"></xsl:param>
+  <xsl:param name="marginBottom"></xsl:param>
+  <xsl:param name="marginBinding"></xsl:param>
 
 
   <!-- Set main language (useful for hyphenation rules)  -->
@@ -148,7 +150,7 @@
   <!-- Do you want to add a prologue to the index nominum? -->
   <xsl:param name="idxNomPrologue"/>
   <!-- Which title do you want for the index nominum? -->
-  <xsl:param name="idxNomTitle">My Index Nominum</xsl:param>
+  <xsl:param name="idxNomTitle">Index Nominum</xsl:param>
   <!-- Do you want to add an index locorum? 0 = no, 1 = yes-->
   <xsl:param name="idxLoc">1</xsl:param>
   <!-- Do you want to add a prologue to the index nominum? -->
@@ -159,7 +161,7 @@
 
 
   <xsl:template match="/">
-    <xsl:text>\documentclass{article}
+    <xsl:text>\documentclass[</xsl:text><xsl:value-of select="$pageSize"/><xsl:if test="$doubleSided = '1'"><xsl:text>,twoside</xsl:text></xsl:if><xsl:text>]{article}
     \usepackage[oldstyle,proportional]{libertine}
     \usepackage{fontspec}
     \usepackage{microtype}
@@ -175,32 +177,48 @@
       <xsl:text>cm}</xsl:text>
     </xsl:if>
     <xsl:if test="$idxNom = '1' or $idxLoc = '1'">
-      <xsl:text>
-        \usepackage[innote]{indextools}
+      <xsl:text>\usepackage[innote]{indextools}
       </xsl:text>
       <!--    \indexsetup{}  -->
       <xsl:if test="$idxNom = '1'">
-        <xsl:text>
-          \makeindex[title={</xsl:text>
+        <xsl:text>\makeindex[title={</xsl:text>
         <xsl:value-of select="$idxNomTitle"/>
         <xsl:text>},name=nominum]</xsl:text>
       </xsl:if>
       <xsl:if test="$idxLoc = '1'">
-        <xsl:text>
-          \makeindex[title={</xsl:text><xsl:value-of select="$idxLocTitle"/>
+        <xsl:text>\makeindex[title={</xsl:text><xsl:value-of select="$idxLocTitle"/>
         <xsl:text>},name=locorum]</xsl:text>
       </xsl:if>
     </xsl:if>
     <xsl:text>
-      \usepackage[</xsl:text><xsl:value-of select="$baseFontSize"/><xsl:text>pt]{extsizes}</xsl:text>
+    \usepackage[</xsl:text><xsl:value-of select="$baseFontSize"/><xsl:text>pt]{extsizes}</xsl:text>
+    <xsl:if test="$marginBinding != '' or $marginInner != '' or $marginOuter != '' or $marginTop != '' or $marginBottom != ''">
     <xsl:text>
-      \usepackage[</xsl:text><xsl:value-of select="$pageSize"
-      /><xsl:text>, twoside, bindingoffset=</xsl:text><xsl:value-of select="$marginBinding"
-      /><xsl:text>cm, inner=</xsl:text><xsl:value-of select="$marginInner"
-      /><xsl:text>cm, outer=</xsl:text><xsl:value-of select="$marginOuter"
-      /><xsl:text>cm, top=</xsl:text><xsl:value-of select="$marginTop"
-      /><xsl:text>cm, bottom=</xsl:text><xsl:value-of select="$marginBottom"/><xsl:text>cm]{geometry} </xsl:text>
-    
+      \usepackage[</xsl:text>
+      <xsl:if test="$marginBinding != ''">
+        <xsl:text>bindingoffset=</xsl:text>
+        <xsl:value-of select="$marginBinding"/>
+        <xsl:text>cm,</xsl:text>
+      </xsl:if>
+      <xsl:if test="$marginBinding != ''">
+        <xsl:text>inner=</xsl:text>
+        <xsl:value-of select="$marginInner"/>
+        <xsl:text>cm,</xsl:text>
+      </xsl:if><xsl:if test="$marginOuter != ''">
+        <xsl:text>outer=</xsl:text>
+        <xsl:value-of select="$marginOuter"/>
+        <xsl:text>cm,</xsl:text>
+      </xsl:if><xsl:if test="$marginTop != ''">
+        <xsl:text>top=</xsl:text>
+        <xsl:value-of select="$marginTop"/>
+        <xsl:text>cm,</xsl:text>
+      </xsl:if><xsl:if test="$marginBottom != ''">
+        <xsl:text>bottom=</xsl:text>
+        <xsl:value-of select="$marginBottom"/>
+        <xsl:text>cm</xsl:text>
+      </xsl:if>
+      <xsl:text>]{geometry}</xsl:text>
+    </xsl:if>
     <!-- Fancy headers and footers -->
     <xsl:text>
     \usepackage{fancyhdr} 
@@ -335,7 +353,7 @@
     <xsl:text>
       \sidenotemargin{</xsl:text><xsl:value-of select="$sideNoteLocation"
       /><xsl:text>} 
-        \pagenumbering{</xsl:text><xsl:value-of select="$pageNumberingStyle"/><xsl:text>} </xsl:text>
+      \pagenumbering{</xsl:text><xsl:value-of select="$pageNumberingStyle"/><xsl:text>} </xsl:text>
     <xsl:if test="$fromPage != '0'">
       <xsl:text>
         \setcounter{page}{</xsl:text><xsl:value-of select="$fromPage"
@@ -358,25 +376,25 @@
       \beginnumbering </xsl:text>
     <xsl:apply-templates select="/tei:TEI/tei:text/tei:body"/>
     <xsl:text>
-      \endnumbering </xsl:text>
+    \endnumbering </xsl:text>
     <xsl:if test="$idxNom = '1'">
       <xsl:if test="$idxNomPrologue != ''"
           ><xsl:text>
-        \indexprologue{\small </xsl:text><xsl:value-of
+  \indexprologue{\small </xsl:text><xsl:value-of
           select="$idxNomPrologue"/><xsl:text>} </xsl:text></xsl:if>
       <xsl:text>
-            \printindex[nominum]</xsl:text>
+  \printindex[nominum]</xsl:text>
     </xsl:if>
     <xsl:if test="$idxLoc = '1'">
       <xsl:if test="$idxLocPrologue != ''">
         <xsl:text>
-        \indexprologue{\small </xsl:text><xsl:value-of select="$idxLocPrologue"
+  \indexprologue{\small </xsl:text><xsl:value-of select="$idxLocPrologue"
         /><xsl:text>} </xsl:text></xsl:if>
       <xsl:text>
-        \printindex[locorum]</xsl:text>
+  \printindex[locorum]</xsl:text>
     </xsl:if>
     <xsl:text>
-       \end{document}</xsl:text>
+\end{document}</xsl:text>
   </xsl:template>
 
   <!-- Prints div heads as a Chapter -->
@@ -1594,7 +1612,8 @@
     <xsl:apply-templates/>
     <!--<xsl:value-of select='normalize-space()'/>--> &amp; </xsl:template>
   <xsl:template match="tei:listWit">
-    <xsl:text>\begin{description}</xsl:text>
+    <xsl:text>
+      \begin{description}</xsl:text>
     <xsl:apply-templates/>
     <xsl:text>
       \end{description}</xsl:text>
