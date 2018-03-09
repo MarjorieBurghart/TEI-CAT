@@ -327,10 +327,6 @@
       
     \begin{document}
   </xsl:text>
-    <xsl:if test="$pageNumFirstPage = '0'">
-      <xsl:text>
-      \thispagestyle{empty}</xsl:text>
-    </xsl:if>
     <xsl:text>
       \sidenotemargin{</xsl:text><xsl:value-of select="$sideNoteLocation"
       /><xsl:text>} 
@@ -343,6 +339,10 @@
     <!-- Printing (or not) the document title -->
     <xsl:if test="$printTitle != '0'">
       \maketitle
+    </xsl:if>
+    <xsl:if test="$pageNumFirstPage = '0'">
+      <xsl:text>
+      \thispagestyle{empty}</xsl:text>
     </xsl:if>
     <xsl:if test="$printListWit != '0'">
       <xsl:if test="//tei:listWit">
