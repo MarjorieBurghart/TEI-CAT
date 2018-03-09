@@ -111,7 +111,7 @@
 
 
   <!-- How to display the contents of tei:head ? -->
-  <!-- Should it be in bold? Accepted values: 1 for italic, 2 for bold -->
+  <!-- Should it be in bold? Accepted values: 1 for italic, 2 for bold, 3 for small caps -->
   <xsl:param name="headStyle">1</xsl:param>
   <!-- vSpace before and after each tei:head, in cm -->
   <xsl:param name="headStylevSpaceBefore">0.5</xsl:param>
@@ -320,6 +320,9 @@
     </xsl:if>
     <xsl:if test="$headStyle = '2'">
       <xsl:text>bf</xsl:text>
+    </xsl:if>
+    <xsl:if test="$headStyle = '3'">
+      <xsl:text>sc</xsl:text>
     </xsl:if>
     <xsl:text>{#1}\vspace{</xsl:text>
     <xsl:value-of select="$headStylevSpaceAfter"/>
