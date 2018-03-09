@@ -165,7 +165,9 @@
     \usepackage{microtype}
     \usepackage{polyglossia}
     \usepackage{bookmark}
-    \hypersetup{pdfborder={0 0 0}}
+    \hypersetup{pdftitle={</xsl:text><xsl:value-of select="//tei:teiHeader/tei:fileDesc/tei:titleStmt/tei:title"/><xsl:text>},
+                pdfauthor={</xsl:text><xsl:value-of select="//tei:teiHeader/tei:fileDesc/tei:titleStmt/tei:author"/><xsl:text>},
+                pdfborder={0 0 0}}
     </xsl:text>
     <xsl:if test="$parStylevSpace != '0'">
       <xsl:text>\setlength{\parskip}{</xsl:text>
@@ -295,10 +297,10 @@
     
     <xsl:text>
       \title{</xsl:text>
-    <xsl:apply-templates select="//tei:teiHeader/tei:fileDesc/tei:titleStmt/tei:title"/>
+    <xsl:value-of select="//tei:teiHeader/tei:fileDesc/tei:titleStmt/tei:title"/>
     <xsl:text>}
       \author{</xsl:text>
-    <xsl:apply-templates select="//tei:teiHeader/tei:fileDesc/tei:titleStmt/tei:author"/>
+    <xsl:value-of select="//tei:teiHeader/tei:fileDesc/tei:titleStmt/tei:author"/>
     <xsl:text>}
       \date{}
     </xsl:text>
