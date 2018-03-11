@@ -343,6 +343,7 @@
     
     <xsl:text>
     % Basic workaround for broken \section functionality in reledmac
+    \makeatletter
     \newcommand{\TEIsection}[1]{\vspace{</xsl:text>
     <xsl:value-of select="$headStylevSpaceBefore"/>
     <xsl:text>cm}\noindent</xsl:text>
@@ -365,9 +366,11 @@
     </xsl:if>
     <xsl:text>{#1}\vspace{</xsl:text>
     <xsl:value-of select="$headStylevSpaceAfter"/>
-    <xsl:text>cm}}
+    <xsl:text>cm}\par\nobreak\vspace{-\parskip}\@afterheading\noindent
+    \makeatother
       
     \begin{document}
+      \raggedbottom
   </xsl:text>
     <xsl:text>
       \sidenotemargin{</xsl:text><xsl:value-of select="$sideNoteLocation"
