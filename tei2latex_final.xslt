@@ -1625,6 +1625,12 @@
 
   <xsl:template match="tei:ref"> \textsuperscript{ <xsl:apply-templates/>} </xsl:template>
 
+  <xsl:template match="tei:subst">
+    <xsl:text> \emph{subst.:} </xsl:text>
+    <xsl:apply-templates select="tei:del"/><xsl:text> \emph{del.,} </xsl:text>
+    <xsl:apply-templates select="tei:add"/><xsl:text> \emph{add.} </xsl:text>    
+  </xsl:template>
+
   <xsl:template match="tei:table"> \begin{tabular}{c|c|c|c} <xsl:apply-templates/> \end{tabular} </xsl:template>
 
   <xsl:template match="tei:row">
