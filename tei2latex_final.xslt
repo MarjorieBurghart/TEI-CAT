@@ -27,12 +27,14 @@
   <!-- Page size? Accepted values: 
  a0paper, a1paper, a2paper, a3paper, a4paper, a5paper, a6paper, b0paper, b1paper, b2paper, b3paper, b4paper, b5paper, b6paper, c0paper, c1paper, c2paper, c3paper, c4paper, c5paper, c6paper, b0j, b1j, b2j, b3j, b4j, b5j, b6j, ansiapaper, ansibpaper, ansicpaper, ansidpaper, ansiepaper, letterpaper, executivepaper, legalpaper -->
   <xsl:param name="pageSize">a4paper</xsl:param>
+  <!-- Use layout for facing pages? Accepted values = 0 (single pages), 1 (facing pages) -->
+  <xsl:param name="facingLayout">0</xsl:param>
   <!-- Setting the size of the margins, in cm -->
-  <xsl:param name="marginInner">3</xsl:param>
-  <xsl:param name="marginOuter">3</xsl:param>
-  <xsl:param name="marginTop">3</xsl:param>
-  <xsl:param name="marginBottom">3</xsl:param>
-  <xsl:param name="marginBinding">0.5</xsl:param>
+  <xsl:param name="marginInner"></xsl:param>
+  <xsl:param name="marginOuter"></xsl:param>
+  <xsl:param name="marginTop"></xsl:param>
+  <xsl:param name="marginBottom"></xsl:param>
+  <xsl:param name="marginBinding"></xsl:param>
 
 
   <!-- Set main language (useful for hyphenation rules)  -->
@@ -60,7 +62,7 @@
   <xsl:param name="qmQuoteNoBr">1</xsl:param>
 
   <!-- start number of pagination; used only if different from 0; The value must always be an arabic numeral, even if you are using a different numbering style. -->
-  <xsl:param name="fromPage">2</xsl:param>
+  <xsl:param name="fromPage">0</xsl:param>
   <!-- Is there a page number on the first page? Accepted values: 0 = No, 1 = Yes -->
   <xsl:param name="pageNumFirstPage">0</xsl:param>
   <!-- Page numbering style: accepted values are
@@ -91,9 +93,9 @@
   <!-- do you want to print the document title? Yes if value is different from 0 -->
   <xsl:param name="printTitle">1</xsl:param>
   <!-- How big should we print the title? Accepted values are large, Large, LARGE, huge, Huge.  Those sizes are relative to the normal font size in the document.  For more information see: http://jacques-andre.fr/fontex/taille.pdf -->
-  <xsl:param name="printTitleSize">Large</xsl:param>
-  <!-- Should we print the title in small caps or caps? Accepted values: 0 (no formatting), smallcaps and caps -->
-  <xsl:param name="printTitleStyle">smallcaps</xsl:param>
+  <xsl:param name="printTitleSize"></xsl:param>
+  <!-- Should we print the title in small caps or caps? Accepted values: smallcaps and caps -->
+  <xsl:param name="printTitleStyle"></xsl:param>
 
 
 
@@ -111,11 +113,11 @@
 
 
   <!-- How to display the contents of tei:head ? -->
-  <!-- Should it be in bold? Accepted values: 1 for bold -->
-  <xsl:param name="headStyleBold">1</xsl:param>
+  <!-- Should it be in bold? Accepted values: 1 for italic, 2 for bold, 3 for small caps -->
+  <xsl:param name="headStyle">1</xsl:param>
   <!-- vSpace before and after each tei:head, in cm -->
-  <xsl:param name="headStylevSpaceBefore">0</xsl:param>
-  <xsl:param name="headStylevSpaceAfter">0.1</xsl:param>
+  <xsl:param name="headStylevSpaceBefore">0.5</xsl:param>
+  <xsl:param name="headStylevSpaceAfter">0.3</xsl:param>
   <!-- How big should we print the tei:head elements ? Accepted values are 0 (no specification), large, Large, LARGE, huge, Huge.  Those sizes are relative to the normal font size in the document. -->
   <xsl:param name="headSize">large</xsl:param>
   <!-- How should we align the tei:head? Accepted values: center (to be continued) -->
@@ -124,7 +126,7 @@
 
 
   <!-- vSpace after each tei:p, in cm -->
-  <xsl:param name="parStylevSpace">0.1</xsl:param>
+  <xsl:param name="parStylevSpace">0</xsl:param>
 
   <!-- Side notes for folios -->
   <!-- Write the folio numbers in the margins? 1 = Yes, 0 = No-->
@@ -148,7 +150,7 @@
   <!-- Do you want to add a prologue to the index nominum? -->
   <xsl:param name="idxNomPrologue"/>
   <!-- Which title do you want for the index nominum? -->
-  <xsl:param name="idxNomTitle">My Index Nominum</xsl:param>
+  <xsl:param name="idxNomTitle">Index Nominum</xsl:param>
   <!-- Do you want to add an index locorum? 0 = no, 1 = yes-->
   <xsl:param name="idxLoc">1</xsl:param>
   <!-- Do you want to add a prologue to the index nominum? -->
@@ -159,38 +161,67 @@
 
 
   <xsl:template match="/">
-    <xsl:text>\documentclass{article}
-    \usepackage{polyglossia,fontspec,xunicode}
-    \usepackage{libertine} 
-    \usepackage{soul} 
-    \usepackage{hyperref}
+    <xsl:text>\documentclass[</xsl:text><xsl:value-of select="$pageSize"/><xsl:if test="$facingLayout = '1'"><xsl:text>,twoside</xsl:text></xsl:if><xsl:text>]{article}
+    \usepackage[oldstyle,proportional]{libertine}
+    \usepackage{fontspec}
+    \usepackage{microtype}
+    \usepackage{polyglossia}
+    \usepackage{bookmark}
+    \hypersetup{pdftitle={</xsl:text><xsl:value-of select="//tei:teiHeader/tei:fileDesc/tei:titleStmt/tei:title"/><xsl:text>},
+                pdfauthor={</xsl:text><xsl:value-of select="//tei:teiHeader/tei:fileDesc/tei:titleStmt/tei:author"/><xsl:text>},
+                pdfborder={0 0 0}}
     </xsl:text>
+    <xsl:if test="$parStylevSpace != '0'">
+      <xsl:text>\setlength{\parskip}{</xsl:text>
+      <xsl:value-of select="$parStylevSpace"/>
+      <xsl:text>cm}</xsl:text>
+    </xsl:if>
     <xsl:if test="$idxNom = '1' or $idxLoc = '1'">
-      <xsl:text>
-        \usepackage[innote]{indextools}
+      <xsl:text>\usepackage[innote]{indextools}
       </xsl:text>
       <!--    \indexsetup{}  -->
       <xsl:if test="$idxNom = '1'">
-        <xsl:text>
-          \makeindex[title={</xsl:text>
+        <xsl:text>\makeindex[title={</xsl:text>
         <xsl:value-of select="$idxNomTitle"/>
         <xsl:text>},name=nominum]</xsl:text>
       </xsl:if>
       <xsl:if test="$idxLoc = '1'">
-        <xsl:text>
-          \makeindex[title={</xsl:text><xsl:value-of select="$idxLocTitle"/>
+        <xsl:text>\makeindex[title={</xsl:text><xsl:value-of select="$idxLocTitle"/>
         <xsl:text>},name=locorum]</xsl:text>
       </xsl:if>
     </xsl:if>
     <xsl:text>
-      \usepackage[</xsl:text><xsl:value-of select="$baseFontSize"/><xsl:text>pt]{extsizes}</xsl:text>
+    \usepackage[</xsl:text><xsl:value-of select="$baseFontSize"/><xsl:text>pt]{extsizes}</xsl:text>
+
+    <!-- Set margins -->
+    <xsl:if test="$marginBinding != '' or $marginInner != '' or $marginOuter != '' or $marginTop != '' or $marginBottom != ''">
     <xsl:text>
-      \usepackage[</xsl:text><xsl:value-of select="$pageSize"
-      /><xsl:text>, twoside, bindingoffset=</xsl:text><xsl:value-of select="$marginBinding"
-      /><xsl:text>cm, inner=</xsl:text><xsl:value-of select="$marginInner"
-      /><xsl:text>cm, outer=</xsl:text><xsl:value-of select="$marginOuter"
-      /><xsl:text>cm, top=</xsl:text><xsl:value-of select="$marginTop"
-      /><xsl:text>cm, bottom=</xsl:text><xsl:value-of select="$marginBottom"/><xsl:text>cm]{geometry} </xsl:text>
+      \usepackage[</xsl:text>
+      <xsl:if test="$marginBinding != ''">
+        <xsl:text>bindingoffset=</xsl:text>
+        <xsl:value-of select="$marginBinding"/>
+        <xsl:text>cm,</xsl:text>
+      </xsl:if>
+      <xsl:if test="$marginBinding != ''">
+        <xsl:text>inner=</xsl:text>
+        <xsl:value-of select="$marginInner"/>
+        <xsl:text>cm,</xsl:text>
+      </xsl:if><xsl:if test="$marginOuter != ''">
+        <xsl:text>outer=</xsl:text>
+        <xsl:value-of select="$marginOuter"/>
+        <xsl:text>cm,</xsl:text>
+      </xsl:if><xsl:if test="$marginTop != ''">
+        <xsl:text>top=</xsl:text>
+        <xsl:value-of select="$marginTop"/>
+        <xsl:text>cm,</xsl:text>
+      </xsl:if><xsl:if test="$marginBottom != ''">
+        <xsl:text>bottom=</xsl:text>
+        <xsl:value-of select="$marginBottom"/>
+        <xsl:text>cm</xsl:text>
+      </xsl:if>
+      <xsl:text>]{geometry}</xsl:text>
+    </xsl:if>
+
     <!-- Fancy headers and footers -->
     <xsl:text>
     \usepackage{fancyhdr} 
@@ -239,7 +270,7 @@
       </xsl:otherwise>
     </xsl:choose>
     <xsl:text>
-    \usepackage[series={A,B},noend,noeledsec,noledgroup]{reledmac} 
+    \usepackage[series={A,B},noend,nofamiliar,noeledsec,noledgroup]{reledmac} 
     \Xarrangement[A]{paragraph}
     \Xarrangement[B]{paragraph}</xsl:text>
     <!-- set the space before each series of notes -->
@@ -283,36 +314,77 @@
     <!-- order of the critical and familiar footnotes -->
     <xsl:text>
     \fnpos{critical-familiar}
-    \begin{document} </xsl:text>
-    <xsl:if test="$pageNumFirstPage = '0'">
-      <xsl:text>
-      \thispagestyle{empty}</xsl:text>
+    </xsl:text>
+    
+    <xsl:text>
+      \title{</xsl:text>
+    <xsl:value-of select="//tei:teiHeader/tei:fileDesc/tei:titleStmt/tei:title"/>
+    <xsl:text>}
+      \author{</xsl:text>
+    <xsl:value-of select="//tei:teiHeader/tei:fileDesc/tei:titleStmt/tei:author"/>
+    <xsl:text>}
+      \date{}
+    </xsl:text>
+    
+    <!-- Title styling -->
+    <xsl:if test="$printTitleStyle != '' or $printTitleSize != ''">
+      <xsl:text>\usepackage{titling}
+      \pretitle{\begin{center}</xsl:text>
+      <xsl:choose>
+        <xsl:when test="$printTitleSize != ''"><xsl:text>\</xsl:text><xsl:value-of select="$printTitleSize"/></xsl:when>
+        <xsl:otherwise><xsl:text>\Large</xsl:text></xsl:otherwise>
+      </xsl:choose>
+      <xsl:choose>
+        <xsl:when test="$printTitleStyle = 'smallcaps'"><xsl:text>\scshape</xsl:text></xsl:when>
+        <xsl:when test="$printTitleStyle = 'caps'"><xsl:text>\MakeUppercase</xsl:text></xsl:when>
+      </xsl:choose>
+      <xsl:text>}</xsl:text>
     </xsl:if>
+    
+    <xsl:text>
+    % Basic workaround for broken \section functionality in reledmac
+    \newcommand{\TEIsection}[1]{\vspace{</xsl:text>
+    <xsl:value-of select="$headStylevSpaceBefore"/>
+    <xsl:text>cm}\noindent</xsl:text>
+    <xsl:if test="$headAlign = 'center'">
+      <xsl:text>\centering</xsl:text>
+    </xsl:if>
+    <xsl:if test="$headSize != '0'">
+      <xsl:text>\</xsl:text>
+      <xsl:value-of select="$headSize"/>
+    </xsl:if>
+    <xsl:text>\text</xsl:text>
+    <xsl:if test="$headStyle = '1'">
+      <xsl:text>it</xsl:text>
+    </xsl:if>
+    <xsl:if test="$headStyle = '2'">
+      <xsl:text>bf</xsl:text>
+    </xsl:if>
+    <xsl:if test="$headStyle = '3'">
+      <xsl:text>sc</xsl:text>
+    </xsl:if>
+    <xsl:text>{#1}\vspace{</xsl:text>
+    <xsl:value-of select="$headStylevSpaceAfter"/>
+    <xsl:text>cm}}
+      
+    \begin{document}
+  </xsl:text>
     <xsl:text>
       \sidenotemargin{</xsl:text><xsl:value-of select="$sideNoteLocation"
       /><xsl:text>} 
-        \pagenumbering{</xsl:text><xsl:value-of select="$pageNumberingStyle"/><xsl:text>} </xsl:text>
-    <xsl:if test="$fromPage != '1'">
+      \pagenumbering{</xsl:text><xsl:value-of select="$pageNumberingStyle"/><xsl:text>} </xsl:text>
+    <xsl:if test="$fromPage != '0'">
       <xsl:text>
         \setcounter{page}{</xsl:text><xsl:value-of select="$fromPage"
       /><xsl:text>} </xsl:text>
     </xsl:if>
-    <!-- Printing (or not) the document title, and how -->
+    <!-- Printing (or not) the document title -->
     <xsl:if test="$printTitle != '0'">
+      \maketitle
+    </xsl:if>
+    <xsl:if test="$pageNumFirstPage = '0'">
       <xsl:text>
-        \begin{center}\begin{</xsl:text><xsl:value-of select="$printTitleSize"/><xsl:text>} </xsl:text>
-      <xsl:choose>
-        <xsl:when test="$printTitleStyle = 'smallcaps'"><xsl:text>\textsc{</xsl:text></xsl:when>
-        <xsl:when test="$printTitleStyle = 'caps'"><xsl:text>\MakeUppercase{</xsl:text></xsl:when>
-      </xsl:choose><xsl:apply-templates
-        select="//tei:teiHeader/tei:fileDesc/tei:titleStmt/tei:title"/>
-      <xsl:choose>
-        <xsl:when test="$printTitleStyle = 'smallcaps'"><xsl:text>}</xsl:text></xsl:when>
-        <xsl:when test="$printTitleStyle = 'caps'"><xsl:text>}</xsl:text></xsl:when>
-      </xsl:choose>
-      <xsl:text>
-        \end{</xsl:text><xsl:value-of select="$printTitleSize"
-      /><xsl:text>}\end{center} \vspace{0.8cm} </xsl:text>
+      \thispagestyle{empty}</xsl:text>
     </xsl:if>
     <xsl:if test="$printListWit != '0'">
       <xsl:if test="//tei:listWit">
@@ -323,25 +395,25 @@
       \beginnumbering </xsl:text>
     <xsl:apply-templates select="/tei:TEI/tei:text/tei:body"/>
     <xsl:text>
-      \endnumbering </xsl:text>
+    \endnumbering </xsl:text>
     <xsl:if test="$idxNom = '1'">
       <xsl:if test="$idxNomPrologue != ''"
           ><xsl:text>
-        \indexprologue{\small </xsl:text><xsl:value-of
+  \indexprologue{\small </xsl:text><xsl:value-of
           select="$idxNomPrologue"/><xsl:text>} </xsl:text></xsl:if>
       <xsl:text>
-            \printindex[nominum]</xsl:text>
+  \printindex[nominum]</xsl:text>
     </xsl:if>
     <xsl:if test="$idxLoc = '1'">
       <xsl:if test="$idxLocPrologue != ''">
         <xsl:text>
-        \indexprologue{\small </xsl:text><xsl:value-of select="$idxLocPrologue"
+  \indexprologue{\small </xsl:text><xsl:value-of select="$idxLocPrologue"
         /><xsl:text>} </xsl:text></xsl:if>
       <xsl:text>
-        \printindex[locorum]</xsl:text>
+  \printindex[locorum]</xsl:text>
     </xsl:if>
     <xsl:text>
-       \end{document}</xsl:text>
+\end{document}</xsl:text>
   </xsl:template>
 
   <!-- Prints div heads as a Chapter -->
@@ -354,23 +426,9 @@
   <xsl:template match="tei:head[parent::tei:div or parent::tei:body]">
     <xsl:choose>
       <xsl:when test="not(ancestor::tei:rdg)">
-        <!-- no paragraphs in the footnotes -->
-        <xsl:text> \vspace{</xsl:text>
-        <xsl:value-of select="$headStylevSpaceBefore"/>
-        <xsl:text>cm}</xsl:text>
         <xsl:text>
-      \pstart </xsl:text>
-        <xsl:if test="$headSize != '0'">
-          <xsl:text> \begin{</xsl:text>
-          <xsl:value-of select="$headSize"/>
-          <xsl:text>}</xsl:text>
-        </xsl:if>
-        <xsl:if test="$headAlign = 'center'">
-          <xsl:text>\begin{center}</xsl:text>
-        </xsl:if>
-        <xsl:if test="$headStyleBold = '1'">
-          <xsl:text>\textbf{</xsl:text>
-        </xsl:if>
+      \pstart
+      \TEIsection{</xsl:text>
       </xsl:when>
       <xsl:otherwise>
         <!-- If this is the descendant of a tei:rdg, it will only appear in the critical footnotes, so paragraphs are not allowed here, and we don't want fancy markup either; just a space to separate paragraphs. -->
@@ -378,7 +436,7 @@
       </xsl:otherwise>
     </xsl:choose>
 
-    <!-- several lemmata can end or begin at the same paragramh-like element; we're going to count the number of tei:lem ancestors, and check for all of them is the current element is a first or last descendant -->
+    <!-- several lemmata can end or begin at the same paragraph-like element; we're going to count the number of tei:lem ancestors, and check for all of them is the current element is a first or last descendant -->
     <xsl:variable name="depthOfLem" select="count(ancestor::tei:lem)"/>
     <xsl:call-template name="whileStartLem">
       <xsl:with-param name="depth">
@@ -389,7 +447,7 @@
     <xsl:apply-templates/>
 
 
-    <!-- several lemmata can end or begin at the same paragramh-like element; we're going to count the number of tei:lem ancestors, and check for all of them is the current element is a first or last descendant -->
+    <!-- several lemmata can end or begin at the same paragraph-like element; we're going to count the number of tei:lem ancestors, and check for all of them is the current element is a first or last descendant -->
     <xsl:call-template name="whileEndLem">
       <xsl:with-param name="depth">
         <xsl:value-of select="$depthOfLem"/>
@@ -399,23 +457,8 @@
 
     <xsl:if test="not(ancestor::tei:rdg)">
       <!-- no paragraphs in the footnotes -->
-      <xsl:if test="$headStyleBold = '1'">
-        <xsl:text>}</xsl:text>
-      </xsl:if>
-      <xsl:if test="$headAlign = 'center'">
-        <xsl:text>\end{center}</xsl:text>
-      </xsl:if>
-      <xsl:if test="$headSize != '0'">
-        <xsl:text>\end{</xsl:text>
-        <xsl:value-of select="$headSize"/>
-        <xsl:text>}</xsl:text>
-      </xsl:if>
-
-      <xsl:text>
-    \pend
-    \vspace{</xsl:text>
-      <xsl:value-of select="$headStylevSpaceAfter"/>
-      <xsl:text>cm} </xsl:text>
+      <xsl:text>}
+    \pend</xsl:text>
     </xsl:if>
   </xsl:template>
 
@@ -452,9 +495,8 @@
 
     <xsl:if test="not(ancestor::tei:rdg)">
       <xsl:text>
-      \pend \vspace{</xsl:text>
-      <xsl:value-of select="$parStylevSpace"/>
-      <xsl:text>cm} </xsl:text>
+      \pend
+    </xsl:text>
     </xsl:if>
   </xsl:template>
 
@@ -544,7 +586,7 @@
                       </xsl:if>
                     </xsl:when>
                     <xsl:otherwise>
-                      <xsl:text>\emph{ </xsl:text>
+                      <xsl:text>\emph{</xsl:text>
                       <xsl:value-of select="$varOm"/>
                       <xsl:text>} </xsl:text>
                       <xsl:choose> 
@@ -636,7 +678,7 @@
                     </xsl:when>
                     <xsl:otherwise>
                       <!-- it is an omission by this witness -->
-                      <xsl:text>\emph{ </xsl:text>
+                      <xsl:text>\emph{</xsl:text>
                       <xsl:value-of select="$varOm"/>
                       <xsl:text>} </xsl:text>
                       <xsl:choose> 
@@ -688,7 +730,7 @@
                       <xsl:text>\,</xsl:text>
                     </xsl:if>
                     <xsl:value-of select="lower-case($currentRdg)"/>
-                    <xsl:text>\emph{ </xsl:text>
+                    <xsl:text>\emph{</xsl:text>
                     <xsl:value-of select="$varAdd"/>
                     <xsl:text>} </xsl:text>
                     <xsl:choose> 
@@ -1120,7 +1162,7 @@
                           <xsl:if test="$italWit = '1'"><xsl:text>}</xsl:text></xsl:if>
                         </xsl:when>
                         <xsl:otherwise>
-                          <xsl:text>\emph{ </xsl:text>
+                          <xsl:text>\emph{</xsl:text>
                           <xsl:value-of select="$varOm"/>
                           <xsl:text>} </xsl:text>
                           <xsl:if test="$italWit = '1'"><xsl:text>\emph{</xsl:text></xsl:if>
@@ -1203,7 +1245,7 @@
                         </xsl:when>
                         <xsl:otherwise>
                           <!-- it is an omission by this witness -->
-                          <xsl:text>\emph{ </xsl:text>
+                          <xsl:text>\emph{</xsl:text>
                           <xsl:value-of select="$varOm"/>
                           <xsl:text>} </xsl:text>
                           <xsl:if test="$italWit = '1'"><xsl:text>\emph{</xsl:text></xsl:if>
@@ -1460,9 +1502,9 @@
 
 
   <xsl:template match="tei:bibl" mode="bibl">
-    <xsl:text> \nobreak&lt;</xsl:text>
+    <xsl:text> ⟨</xsl:text>
     <xsl:apply-templates/>
-    <xsl:text>\nobreak&gt;</xsl:text>
+    <xsl:text>⟩</xsl:text>
   </xsl:template>
   <xsl:template match="tei:bibl" mode="src">
     <xsl:apply-templates/>
@@ -1528,9 +1570,8 @@
           <xsl:when test="ancestor::tei:p"/>
           <xsl:otherwise>
             <xsl:text>
-              \pend \vspace{</xsl:text>
-            <xsl:value-of select="$parStylevSpace"/>
-            <xsl:text>cm} </xsl:text>
+              \pend
+            </xsl:text>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
@@ -1590,21 +1631,24 @@
     <xsl:apply-templates/>
     <!--<xsl:value-of select='normalize-space()'/>--> &amp; </xsl:template>
   <xsl:template match="tei:listWit">
+    <xsl:text>
+      \begin{description}</xsl:text>
     <xsl:apply-templates/>
     <xsl:text>
-      \vspace{0.8cm}</xsl:text>
+      \end{description}</xsl:text>
   </xsl:template>
   <xsl:template match="tei:witness">
     <xsl:text>
-      \par \textbf{</xsl:text>
+      \item[</xsl:text>
     <xsl:value-of select="@xml:id"/>
-    <xsl:text>} - </xsl:text>
+    <xsl:text>]
+    </xsl:text>
     <xsl:apply-templates/>
   </xsl:template>
 
   <tex:replace-map>
-    <entry key="&gt;">$\rangle$</entry>
-    <entry key="&lt;">$\langle$</entry>
+    <entry key="&gt;">⟩</entry>
+    <entry key="&lt;">⟨</entry>
     <entry key="&amp;">\&amp;</entry>
     <entry key="_">\_</entry>
     <entry key="%">\%</entry>
