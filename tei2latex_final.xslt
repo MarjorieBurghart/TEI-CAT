@@ -631,7 +631,7 @@
                 <xsl:text> </xsl:text>
                 <xsl:value-of
                   select="translate(lower-case($currentLemmaNote[position() = 3]), ',.!?:;)', '')"/>
-                <xsl:text> \dots </xsl:text>
+                <xsl:text> \ldots{} </xsl:text>
                 <xsl:value-of
                   select="translate(lower-case($currentLemmaNote[last() - 2]), ',.!?:;)', '')"/>
                 <xsl:text> </xsl:text>
@@ -1202,7 +1202,7 @@
                     <xsl:text> </xsl:text>
                     <xsl:value-of
                       select="translate(lower-case($currentLemmaNote[position() = 3]), ',.!?:;)', '')"/>
-                    <xsl:text> \dots </xsl:text>
+                    <xsl:text> \ldots{} </xsl:text>
                     <xsl:value-of
                       select="translate(lower-case($currentLemmaNote[last() - 2]), ',.!?:;)', '')"/>
                     <xsl:text> </xsl:text>
